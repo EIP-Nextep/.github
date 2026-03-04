@@ -17,4 +17,4 @@ jobs:
           organization: 'EIP-Nextep'
           project_id: 3
           resource_type: PR
-          status_value: 'In Review'
+          status_value: '👀 In review'
