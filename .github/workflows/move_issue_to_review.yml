@@ -16,5 +16,6 @@ jobs:
           gh_token: ${{ secrets.ORG_PROJECT_TOKEN }}
           organization: 'EIP-Nextep'
           project_id: 3
+          resource_node_id: ${{ github.event.pull_request.node_id }}
           status_value: '👀 In review'
           move_related_issues: true
