@@ -1,0 +1,20 @@
+name: Central - Move linked Issue to Review
+
+on:
+  workflow_call:
+    secrets:
+      ORG_PROJECT_TOKEN:
+        required: true
+
+jobs:
+  move_to_review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move Issue to Review
+        uses: leonsteinhaeuser/project-beta-automations@v2.2.1
+        with:
+          gh_token: ${{ secrets.ORG_PROJECT_TOKEN }}
+          organization: 'EIP-Nextep'
+          project_id: 3
+          resource_type: PR
+          status_value: 'In Review'
