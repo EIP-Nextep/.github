@@ -16,5 +16,5 @@ jobs:
           gh_token: ${{ secrets.ORG_PROJECT_TOKEN }}
           organization: 'EIP-Nextep'
           project_id: 3
-          resource_type: PR
           status_value: '👀 In review'
+          move_related_issues: true
