@@ -1,0 +1,49 @@
+name: Discord Ping
+
+on:
+  workflow_call:
+    secrets:
+      DISCORD_WEBHOOK_URL:
+        required: true
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Traduction GitHub -> Discord
+        id: mapping
+        run: |
+          # On récupère les pseudos GitHub des reviewers au format JSON
+          REVIEWERS='${{ toJson(github.event.pull_request.requested_reviewers) }}'
+          
+          # On extrait juste les logins avec jq
+          LOGINS=$(echo $REVIEWERS | jq -r '.[].login // empty')
+          
+          MENTIONS=""
+          # La boucle magique de traduction !
+          # REMPLACE LES CHIFFRES PAR VOS VRAIS ID DISCORD
+          for login in $LOGINS; do
+            case $login in
+              "vigneshmourou") MENTIONS="$MENTIONS <@372092592772612108>" ;;
+              "dalia789") MENTIONS="$MENTIONS <@1138510333431005184>" ;;
+              "TheoCouto") MENTIONS="$MENTIONS <@1137475401116041388>" ;;
+              "jasonzohou") MENTIONS="$MENTIONS <@499595499712544788>" ;;
+            esac
+          done
+          
+          # On sauvegarde le résultat pour l'étape suivante
+          echo "mentions=$MENTIONS" >> $GITHUB_OUTPUT
+
+      - name: Envoi du Ping sur Discord
+        if: steps.mapping.outputs.mentions != ''
+        run: |
+          # Construction du message JSON pour Discord
+          PAYLOAD=$(cat <<EOF
+          {
+            "content": "**Nouvelle Pull Request !**\n**Branches** : \`${{ github.event.pull_request.head.ref }}\` ➔ \`${{ github.event.pull_request.base.ref }}\`\nAuteur : \`${{ github.actor }}\`\nRelecteurs demandés : ${{ steps.mapping.outputs.mentions }}\nCliquez ici pour relire : ${{ github.event.pull_request.html_url }}"
+          }
+          EOF
+          )
+          
+          # Envoi via curl
+          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" ${{ secrets.DISCORD_WEBHOOK_URL }}
